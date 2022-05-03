@@ -236,7 +236,8 @@ class SANBERTNetwork(nn.Module):
             end_scores = end_scores.squeeze(-1)
             return start_scores, end_scores
         elif task_type == TaskType.SequenceLabeling:
-            pooled_output = all_encoder_layers[-1]
+            #pooled_output = all_encoder_layers[-1]
+            pooled_output = all_encoder_layers
             pooled_output = self.dropout_list[task_id](pooled_output)
             pooled_output = pooled_output.contiguous().view(-1, pooled_output.size(2))
             logits = self.scoring_list[task_id](pooled_output)

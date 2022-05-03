@@ -627,7 +627,7 @@ class MTDNNModel(MTDNNPretrainedModel):
             logger.info(f"Saving mt-dnn model to {model_file}")
             self.save(model_file)
 
-    def predict(self, trained_model_chckpt: str = None, saved_epoch_idx: int = 0):
+    def predict(self, trained_model_chckpt: str = None, saved_epoch_idx: int = 0, calc_test_metrics=False):
         """ 
         Inference of model on test datasets
         """
@@ -704,7 +704,7 @@ class MTDNNModel(MTDNNPretrainedModel):
                         test_data,
                         metric_meta=self.task_defs.metric_meta_map[prefix],
                         use_cuda=self.config.cuda,
-                        with_label=False,
+                        with_label=calc_test_metrics,
                         label_mapper=label_dict,
                         task_type=self.task_defs.task_type_map[prefix],
                     )
@@ -772,6 +772,8 @@ class MTDNNModel(MTDNNPretrainedModel):
             "mtdnn-large-uncased",
             "roberta.base",
             "roberta.large",
+            'cimm-kzn/enrudr-bert',
+            'DeepPavlov/rubert-base-cased-conversational'
         ]
 
     def update_config_with_training_opts(

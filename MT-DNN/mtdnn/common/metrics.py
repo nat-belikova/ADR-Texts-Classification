@@ -2,7 +2,7 @@
 from enum import Enum
 
 from sklearn.metrics import matthews_corrcoef
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.metrics import roc_auc_score
 from scipy.stats import pearsonr, spearmanr
 from seqeval.metrics import classification_report
@@ -15,6 +15,14 @@ def compute_acc(predicts, labels):
 
 def compute_f1(predicts, labels):
     return 100.0 * f1_score(labels, predicts)
+
+
+def compute_precision(predicts, labels):
+    return 100.0 * precision_score(labels, predicts)
+
+
+def compute_recall(predicts, labels):
+    return 100.0 * recall_score(labels, predicts)
 
 
 def compute_mcc(predicts, labels):
@@ -72,6 +80,8 @@ class Metric(Enum):
     AUC = 5
     SeqEval = 7
     EmF1 = 8
+    Precision = 9
+    Recall = 10
 
 
 METRIC_FUNC = {
@@ -83,6 +93,8 @@ METRIC_FUNC = {
     Metric.AUC: compute_auc,
     Metric.SeqEval: compute_seqacc,
     Metric.EmF1: compute_emf1,
+    Metric.Precision: compute_precision,
+    Metric.Recall: compute_recall,
 }
 
 
@@ -94,7 +106,7 @@ def calc_metrics(metric_meta, golds, predictions, scores, label_mapper=None):
     for mm in metric_meta:
         metric_name = mm.name
         metric_func = METRIC_FUNC[mm]
-        if mm in (Metric.ACC, Metric.F1, Metric.MCC):
+        if mm in (Metric.ACC, Metric.F1, Metric.MCC, Metric.Precision, Metric.Recall):
             metric = metric_func(predictions, golds)
         elif mm == Metric.SeqEval:
             metric = metric_func(predictions, golds, label_mapper)

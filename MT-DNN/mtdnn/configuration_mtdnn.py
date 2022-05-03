@@ -124,13 +124,14 @@ class MTDNNConfig(PretrainedConfig):
     ):
         # basic Configuration validation
         # assert inital checkpoint and encoder type are same
-        assert init_checkpoint.startswith(
-            encoder_checkpoint_map[encoder_type]
-        ), """Encoder type and initial checkpoint mismatch. 
-            1 - Bert models
-            2 - Roberta models
-            """
-        super(MTDNNConfig, self).__init__(**kwargs)
+#         assert init_checkpoint.startswith(
+#             encoder_checkpoint_map[encoder_type]
+#        ), """Encoder type and initial checkpoint mismatch. 
+#            1 - Bert models
+#            2 - Roberta models
+#            """
+#        super(MTDNNConfig, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.use_pretrained_model = use_pretrained_model
         self.encoder_type = encoder_type
         self.vocab_size = vocab_size

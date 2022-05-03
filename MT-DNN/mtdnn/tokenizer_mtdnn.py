@@ -12,11 +12,12 @@ class MTDNNTokenizer:
         self, model_name: str = "bert-base-uncased", do_lower_case: bool = False,
     ):
         self._model_name = model_name
-        self.literal_model_name = model_name.split("-")[0]
+        #self.literal_model_name = model_name.split("-")[0]
+        self.literal_model_name = 'bert'
         self.model_type = EncoderModelType[
             self.literal_model_name.upper()
         ].name  # BERT = 1, ROBERTA = 2
-        mt_dnn_model_name_fmt = model_name.replace("-", "_")  # format to mt-dnn format
+        mt_dnn_model_name_fmt = model_name.replace("-", "_").replace('/', '_')  # format to mt-dnn format
         self.mt_dnn_suffix = (
             f"{mt_dnn_model_name_fmt}_lower"
             if do_lower_case

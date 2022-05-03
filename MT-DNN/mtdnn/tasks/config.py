@@ -92,6 +92,34 @@ class TaskConfig(object):
         """Serializes this instance to a Python dictionary."""
         return copy.deepcopy(self.__dict__)
 
+    
+class ClAdrTaskConfig(TaskConfig):
+    def __init__(self, kwargs: dict = {}):
+        if not kwargs:
+            kwargs = {
+                "task_name": "cladr",
+                "data_format": "PremiseOnly",
+                "encoder_type": "BERT",
+                "dropout_p": 0.1,
+                "enable_san": False,
+                "metric_meta": ["F1"],
+                "loss": "CeCriterion",
+                "kd_loss": "MseCriterion",
+                "n_class": 2,
+                'split_names': [
+                    'train',
+                    'dev',
+                    'test',
+                ],
+                 "data_process_opts": {
+                     "header": True,
+                     "is_train": True,
+                     "multi_snli": False,
+                 },
+                "task_type": "Classification",
+            }
+        super().__init__(**kwargs)
+    
 
 class COLATaskConfig(TaskConfig):
     def __init__(self, kwargs: dict = {}):
@@ -315,7 +343,7 @@ class NERTaskConfig(TaskConfig):
         if not kwargs:
             kwargs = {
                 "task_name": "ner",
-                "data_format": "Seqence",
+                "data_format": "Sequence",
                 "encoder_type": "BERT",
                 "dropout_p": 0.3,
                 "enable_san": False,
@@ -365,7 +393,7 @@ class POSTaskConfig(TaskConfig):
         if not kwargs:
             kwargs = {
                 "task_name": "pos",
-                "data_format": "Seqence",
+                "data_format": "Sequence",
                 "encoder_type": "BERT",
                 "dropout_p": 0.1,
                 "enable_san": False,
@@ -489,7 +517,7 @@ class CHUNKTaskConfig(TaskConfig):
         if not kwargs:
             kwargs = {
                 "task_name": "chunk",
-                "data_format": "Seqence",
+                "data_format": "Sequence",
                 "encoder_type": "BERT",
                 "dropout_p": 0.1,
                 "enable_san": False,
@@ -595,6 +623,10 @@ class MaskLMTaskConfig(TaskConfig):
 
 # Map of supported tasks
 SUPPORTED_TASKS_MAP = {
+    'clrus': ClAdrTaskConfig,
+    'cleng': ClAdrTaskConfig,
+    'extrus': NERTaskConfig,
+    'exteng': NERTaskConfig,
     "cola": COLATaskConfig,
     "mnli": MNLITaskConfig,
     "mrpc": MRPCTaskConfig,

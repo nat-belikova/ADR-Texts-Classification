@@ -13,6 +13,7 @@ from mtdnn.common.types import DataFormat, EncoderModelType
 from mtdnn.common.utils import MTDNNCommonUtils
 from mtdnn.tasks.config import MTDNNTaskDefs
 from mtdnn.tasks.utils import (
+    load_cladr,
     load_cola,
     load_conll_chunk,
     load_conll_ner,
@@ -36,6 +37,8 @@ logger = MTDNNCommonUtils.create_logger(__name__, to_disk=True)
 
 # Map of supported tasks
 GLUE_SUPPORTED_TASKS_LOADER_MAP = {
+    'clrus': load_cladr,
+    'cleng': load_cladr,
     "cola": load_cola,
     "mnli": load_mnli,
     "mrpc": load_mrpc,
@@ -49,6 +52,8 @@ GLUE_SUPPORTED_TASKS_LOADER_MAP = {
     "wnli": load_wnli,
 }
 NER_SUPPORTED_TASKS_LOADER_MAP = {
+    'extrus': load_conll_ner,
+    'exteng': load_conll_ner,
     "ner": load_conll_ner,
     "pos": load_conll_pos,
     "chunk": load_conll_chunk,
@@ -110,7 +115,8 @@ class MTDNNTaskDataFileLoader:
             # For each task, we process the provided data files into MT-DNN format
             # Format of input is of the form MNLI/{train.tsv, dev_matched.tsv, dev_mismatched.tsv, ...}
             for path in params["data_paths"]:
-                in_file_path = os.path.join(self.data_dir, path)
+                #in_file_path = os.path.join(self.data_dir, path)
+                in_file_path = path
                 in_file = os.path.split(path)[-1]
                 out_file_name = f"{name}_{in_file}"
                 out_file_path = os.path.join(self.canonical_data_dir, out_file_name)
@@ -173,13 +179,14 @@ class MTDNNDataBuilder:
         self.model_name = (
             self.tokenizer.get_model_name()
         )  # ensure model name is same as tokenizer
-        self.literal_model_name = self.model_name.split("-")[0]
+        #self.literal_model_name = self.model_name.split("-")[0]
+        self.literal_model_name = 'bert'
         self.model_type = EncoderModelType[
             self.literal_model_name.upper()
         ]  # BERT = 1, ROBERTA = 2ll
         mt_dnn_model_name_fmt = self.model_name.replace(
             "-", "_"
-        )  # format to mt-dnn format
+        ).replace('/', '_')  # format to mt-dnn format
         self.mt_dnn_suffix = (
             f"{mt_dnn_model_name_fmt}_lower"
             if do_lower_case
@@ -290,7 +297,9 @@ class MTDNNDataBuilder:
             tokens = []
             labels = []
             for i, word in tqdm(enumerate(premise), desc="Building Sequence Premise"):
-                subwords = tokenizer.tokenize(word)
+                #subwords = tokenizer.tokenize(word)
+                w_input_ids, w_mask, w_type_ids = self.tokenizer.encode(text=word)
+                subwords = w_input_ids[:w_type_ids.count(0)][1:-1]
                 tokens.extend(subwords)
                 for j in range(len(subwords)):
                     if j == 0:
@@ -302,9 +311,10 @@ class MTDNNDataBuilder:
                 labels = labels[: max_seq_len - 2]
 
             label = [label_mapper["CLS"]] + labels + [label_mapper["SEP"]]
-            input_ids = tokenizer.convert_tokens_to_ids(
-                [tokenizer.cls_token] + tokens + [tokenizer.sep_token]
-            )
+            #input_ids = self.tokenizer.convert_tokens_to_ids(
+            #    [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
+            #)
+            input_ids = [101] + tokens + [102]
             assert len(label) == len(input_ids)
             type_ids = [0] * len(input_ids)
             features = {

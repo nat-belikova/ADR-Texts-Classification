@@ -58,6 +58,29 @@ def process_data_and_dump_rows(
     return processed_rows
 
 
+def load_cladr(file_path, kwargs: dict = {}):
+    """Loading Russian Dataset for Classification"""
+    
+    header = kwargs.get("header", True)
+    rows = []
+    cnt = 0
+    with open(file_path) as f:
+        for line in f:
+            if header:
+                header = False
+                continue
+            blocks = line.strip().split('\t')
+            assert len(blocks) > 2
+            sample = {
+                'uid': blocks[0],
+                'premise': blocks[1],
+                'label': blocks[2],
+            }
+            rows.append(sample)
+            cnt += 1
+    return rows
+            
+
 def load_scitail(file_path, kwargs: dict = {}):
     """ Loading scitail """
 
